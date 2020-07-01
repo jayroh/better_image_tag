@@ -11,3 +11,5 @@
 /tmp/
 /gemfiles/*.lock
 /gemfiles/.bundle
+/spec/dummy/tmp/cache/*
+/spec/dummy/log/*
