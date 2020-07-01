@@ -1,0 +1,13 @@
+/.rspec_status
+/.bundle/
+/.overcommit.yml
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+/gemfiles/*.lock
+/gemfiles/.bundle
