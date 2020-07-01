@@ -15,6 +15,8 @@ module BetterImageTag
     end
 
     def with_size
+      return self if options[:width].present? || options[:height].present?
+
       Rails.cache.fetch "image_tag:with_size:#{image}" do
         dimensions = FastImage.size(asset)
         options[:width] = dimensions&.first
@@ -22,6 +24,18 @@ module BetterImageTag
       end
 
       self
+    end
+
+    def lazy_load(placeholder: nil)
+      placeholder ||= 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
+      options[:class] = Array(options.fetch(:class, [])).join(' ')
+      options[:class] = "#{options[:class]} lazyload".strip
+
+      data_attribs = { src: view_context.image_path(image) }
+      options[:data] = options[:data].to_h.merge(data_attribs)
+
+      view_context.image_tag(placeholder, options)
     end
 
     def to_s
