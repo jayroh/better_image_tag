@@ -15,10 +15,11 @@ module BetterImageTag
   end
 
   class Configuration
-    attr_accessor :require_alt_tags
+    attr_accessor :require_alt_tags, :cache_enabled
 
     def initialize
       @require_alt_tags = false
+      @cache_enabled = false
     end
   end
 end

@@ -5,5 +5,6 @@ module BetterImageTag
     class Error < StandardError; end
 
     class MissingAltTag < Error; end
+    class EarlyLazyLoad < Error; end
   end
 end

@@ -4,9 +4,11 @@ require 'fastimage'
 
 module BetterImageTag
   class ImageTag
-    attr_reader :view_context, :image, :options
+    attr_reader :request, :view_context, :options
+    attr_accessor :image
 
-    def initialize(view_context, image, options = {})
+    def initialize(request, view_context, image, options = {})
+      @request = request
       @view_context = view_context
       @image = with_protocol(image)
       @options = options.symbolize_keys
@@ -17,7 +19,7 @@ module BetterImageTag
     def with_size
       return self if options[:width].present? || options[:height].present?
 
-      Rails.cache.fetch "image_tag:with_size:#{image}" do
+      cache "image_tag:with_size:#{image}" do
         dimensions = FastImage.size(asset)
         options[:width] = dimensions&.first
         options[:height] = dimensions&.last
@@ -27,25 +29,40 @@ module BetterImageTag
     end
 
     def lazy_load(placeholder: nil)
-      placeholder ||= 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-
       options[:class] = Array(options.fetch(:class, [])).join(' ')
       options[:class] = "#{options[:class]} lazyload".strip
+      options[:data] = options[:data]
+                       .to_h
+                       .merge(src: view_context.image_path(image))
 
-      data_attribs = { src: view_context.image_path(image) }
-      options[:data] = options[:data].to_h.merge(data_attribs)
+      @image = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
-      view_context.image_tag(placeholder, options)
+      self
+    end
+
+    def webp
+      if image.match?(/^data:/)
+        raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
+      end
+
+      self.image = image.gsub(/\.[a-z]{2,}*\z/, '.webp') if accepts_webp?
+
+      self
     end
 
     def to_s
-      view_context.image_tag(image, options)
+      super_options = Rails.env.test? ? {} : { use_super: true }
+      view_context.image_tag(image, options.merge(super_options))
     end
 
     private
 
-    def with_protocol(src)
-      src.match?(%r{^//}) ? "https:#{src}" : src
+    def accepts_webp?
+      @_accepts_webp ||= request&.headers['HTTP_ACCEPT'].to_s.match?('image/webp')
+    end
+
+    def with_protocol(image)
+      image.match?(%r{^//}) ? "https:#{image}" : image
     end
 
     def asset
@@ -68,6 +85,13 @@ module BetterImageTag
       if BetterImageTag.configuration&.require_alt_tags && options[:alt].blank?
         raise Errors::MissingAltTag, "#{image} is missing an alt tag"
       end
+    end
+
+    def cache(tag, &block)
+      return unless block
+      return block.call unless BetterImageTag.configuration&.cache_enabled
+
+      Rails.cache.fetch tag, &block
     end
   end
 end
