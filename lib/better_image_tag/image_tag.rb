@@ -51,11 +51,14 @@ module BetterImageTag
     end
 
     def to_s
-      super_options = Rails.env.test? ? {} : { use_super: true }
       view_context.image_tag(image, options.merge(super_options))
     end
 
     private
+
+    def super_options
+      { use_super: true }
+    end
 
     def accepts_webp?
       @_accepts_webp ||= request&.headers['HTTP_ACCEPT'].to_s.match?('image/webp')

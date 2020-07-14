@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe BetterImageTag::ImageTag do
-  let(:request) { double('request', headers: {}) }
+  let(:default_request) { double('request', headers: {}) }
 
   let(:view_context) do
     view_paths = ActionController::Base.view_paths
@@ -19,97 +19,93 @@ RSpec.describe BetterImageTag::ImageTag do
 
   describe '#to_s' do
     it 'returns an image tag' do
-      tag = described_class.new(request, view_context, '1x1.gif').to_s
+      result = tag.to_s
 
-      expect(tag).to eq '<img src="/assets/1x1.gif" />'
+      expect(result).to eq '<img src="/assets/1x1.gif" />'
     end
 
     it 'returns full url when passed URL' do
-      tag = described_class.new(request, view_context, 'https://example.com/1.gif').to_s
+      result = tag(image: 'https://example.com/1.gif').to_s
 
-      expect(tag).to eq '<img src="https://example.com/1.gif" />'
+      expect(result).to eq '<img src="https://example.com/1.gif" />'
     end
   end
 
   describe '#lazy_load' do
     it 'inlines a transparent gif and sets src on data attribute' do
-      tag = described_class.new(request, view_context, '1x1.gif').lazy_load.to_s
       data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      result = tag.lazy_load.to_s
 
-      expect(tag).to include %(class="lazyload")
-      expect(tag).to include %(data-src="/assets/1x1.gif")
-      expect(tag).to include %(src="#{data}")
+      expect(result).to include %(class="lazyload")
+      expect(result).to include %(data-src="/assets/1x1.gif")
+      expect(result).to include %(src="#{data}")
     end
 
     it 'inlines transparent gif and uses full url in data-src' do
       url = 'https://example.com/1x1.gif'
       data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-      tag = described_class.new(request, view_context, url).lazy_load.to_s
+      result = tag(image: url).lazy_load.to_s
 
-      expect(tag).to eq %(<img class="lazyload" data-src="#{url}" src="#{data}" />)
+      expect(result).to eq %(<img class="lazyload" data-src="#{url}" src="#{data}" />)
     end
   end
 
   describe '#with_size' do
     it 'returns image tag with size' do
-      tag = described_class.new(request, view_context, '1x1.gif').with_size.to_s
+      result = tag.with_size.to_s
 
-      expect(tag).to eq '<img width="1" height="1" src="/assets/1x1.gif" />'
+      expect(result).to eq '<img width="1" height="1" src="/assets/1x1.gif" />'
     end
 
     it 'defaults to the sizes provided' do
-      tag = described_class
-            .new(request, view_context, '1x1.gif', width: 10, height: 10)
-            .with_size
-            .to_s
+      result = tag(options: { width: 10, height: 10 }).with_size.to_s
 
-      expect(tag).to eq '<img width="10" height="10" src="/assets/1x1.gif" />'
+      expect(result).to eq '<img width="10" height="10" src="/assets/1x1.gif" />'
     end
 
     it 'returns image tag with size when using a remote url' do
       url = 'https://via.placeholder.com/1x1.png'
-      tag = described_class.new(request, view_context, url).with_size.to_s
+      result = tag(image: url).with_size.to_s
 
-      expect(tag).to eq %(<img width="1" height="1" src="#{url}" />)
+      expect(result).to eq %(<img width="1" height="1" src="#{url}" />)
     end
   end
 
   describe '#webp' do
     it 'returns the webp version of an image when browser supports it' do
       request = double('request', headers: { 'HTTP_ACCEPT' => 'image/webp' })
+      result = tag(request: request).webp.to_s
 
-      tag = described_class.new(request, view_context, '1x1.gif').webp.to_s
-
-      expect(tag).to eq '<img src="/assets/1x1.webp" />'
+      expect(result).to eq '<img src="/assets/1x1.webp" />'
     end
 
-    it 'does not return the webp version of an image when browser does not support it' do
+    it "doesn't return webp version of image when browser doesn't support it" do
       request = double('request', headers: { 'HTTP_ACCEPT' => 'image/gif' })
+      result = tag(request: request).webp.to_s
 
-      tag = described_class.new(request, view_context, '1x1.gif').webp.to_s
-
-      expect(tag).to eq '<img src="/assets/1x1.gif" />'
+      expect(result).to eq '<img src="/assets/1x1.gif" />'
     end
   end
 
   context 'when requiring alt tags for all images' do
-    it 'raises an exception' do
+    before do
       BetterImageTag.configure do |config|
         config.require_alt_tags = true
       end
+    end
 
-      expect do
-        described_class.new(request, view_context, '1x1.gif')
-      end.to raise_error(BetterImageTag::Errors::MissingAltTag)
+    it 'raises an exception' do
+      expect { tag }.to raise_error(BetterImageTag::Errors::MissingAltTag)
     end
 
     it 'does not raise an exception if alt tag is provided' do
-      BetterImageTag.configure do |config|
-        config.require_alt_tags = true
-      end
+      expect { tag(options: { alt: 'description' }) }.not_to raise_error
+    end
+  end
 
-      expect { described_class.new(request, view_context, '1x1.gif', alt: 'gif') }
-        .not_to raise_error
+  def tag(request: default_request, image: '1x1.gif', options: {})
+    described_class.new(request, view_context, image, options).tap do |tag|
+      allow(tag).to receive(:super_options).and_return({})
     end
   end
 end
