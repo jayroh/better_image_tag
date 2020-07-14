@@ -11,7 +11,7 @@ RSpec.describe BetterImageTag::ImageTag do
     ActionView::Base.new(lookup_context, {})
   end
 
-  after do
+  before do
     BetterImageTag.configure do |config|
       config.require_alt_tags = false
     end

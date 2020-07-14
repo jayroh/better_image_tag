@@ -17,6 +17,8 @@ module BetterImageTag
     end
 
     def inline_data
+      return image unless BetterImageTag.configuration.inlining_enabled
+
       "data:#{content_type};base64,#{base64_contents}"
     end
 

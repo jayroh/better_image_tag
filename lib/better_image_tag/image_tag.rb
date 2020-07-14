@@ -85,14 +85,14 @@ module BetterImageTag
     end
 
     def enforce_requirements
-      if BetterImageTag.configuration&.require_alt_tags && options[:alt].blank?
+      if BetterImageTag.configuration.require_alt_tags && options[:alt].blank?
         raise Errors::MissingAltTag, "#{image} is missing an alt tag"
       end
     end
 
     def cache(tag, &block)
       return unless block
-      return block.call unless BetterImageTag.configuration&.cache_enabled
+      return block.call unless BetterImageTag.configuration.cache_enabled
 
       Rails.cache.fetch tag, &block
     end

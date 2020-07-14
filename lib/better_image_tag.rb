@@ -6,7 +6,11 @@ require "better_image_tag/inline_data"
 
 module BetterImageTag
   class << self
-    attr_accessor :configuration
+    attr_writer :configuration
+  end
+
+  def self.configuration
+    @configuration ||= Configuration.new
   end
 
   def self.configure
@@ -15,11 +19,16 @@ module BetterImageTag
   end
 
   class Configuration
-    attr_accessor :require_alt_tags, :cache_enabled
+    attr_accessor(
+      :cache_enabled,
+      :inlining_enabled,
+      :require_alt_tags
+    )
 
     def initialize
       @require_alt_tags = false
       @cache_enabled = false
+      @inlining_enabled = true
     end
   end
 end
