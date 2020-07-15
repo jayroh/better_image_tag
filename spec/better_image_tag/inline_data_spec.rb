@@ -40,5 +40,28 @@ RSpec.describe BetterImageTag::InlineData do
         expect(result).to eq('1x1.gif')
       end
     end
+
+    context 'when there is a network error' do
+      it 'returns the original image src when ssl error' do
+        url = 'http://localhost/nothing.jpg'
+        inliner = BetterImageTag::InlineData.new(url)
+        allow(inliner).to receive(:open).and_raise(OpenSSL::SSL::SSLError)
+
+        result = inliner.inline_data
+
+        expect(result).to eq(url)
+      end
+
+      it 'returns the original image src when http error' do
+        url = 'http://localhost/nothing.jpg'
+        inliner = BetterImageTag::InlineData.new(url)
+        error = OpenURI::HTTPError.new 'error', nil
+        allow(inliner).to receive(:open).and_raise(error)
+
+        result = inliner.inline_data
+
+        expect(result).to eq(url)
+      end
+    end
   end
 end

@@ -69,6 +69,13 @@ RSpec.describe BetterImageTag::ImageTag do
 
       expect(result).to eq %(<img width="1" height="1" src="#{url}" />)
     end
+
+    it "returns plain tag when remote url is 404'ing" do
+      url = 'http://localhost/nothing.jpg'
+      result = tag(image: url).with_size.to_s
+
+      expect(result).to eq %(<img src="#{url}" />)
+    end
   end
 
   describe '#webp' do

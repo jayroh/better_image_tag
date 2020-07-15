@@ -6,6 +6,18 @@ require 'open-uri'
 
 module BetterImageTag
   class InlineData
+    HTTP_ERRORS = [
+      EOFError,
+      Errno::ECONNRESET,
+      Errno::EINVAL,
+      Net::HTTPBadResponse,
+      Net::HTTPHeaderSyntaxError,
+      Net::ProtocolError,
+      Timeout::Error,
+      OpenSSL::SSL::SSLError,
+      OpenURI::HTTPError
+    ].freeze
+
     def self.inline_data(image)
       new(image).inline_data
     end
@@ -22,6 +34,8 @@ module BetterImageTag
       cache "inline_data:#{image}" do
         "data:#{content_type};base64,#{base64_contents}"
       end
+    rescue *HTTP_ERRORS
+      image
     end
 
     private
