@@ -19,11 +19,9 @@ module BetterImageTag
     def with_size
       return self if options[:width].present? || options[:height].present?
 
-      cache "image_tag:with_size:#{image}" do
-        dimensions = FastImage.size(asset)
-        options[:width] = dimensions&.first
-        options[:height] = dimensions&.last
-      end
+      dims = cache("image_tag:with_size:#{image}") { FastImage.size(asset) }
+      options[:width] = dims&.first
+      options[:height] = dims&.last
 
       self
     end
