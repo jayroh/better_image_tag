@@ -92,7 +92,10 @@ module BetterImageTag
 
     def cache(tag, &block)
       return unless block
-      return block.call unless BetterImageTag.configuration.cache_enabled
+
+      unless BetterImageTag.configuration.cache_sizing_enabled
+        return block.call
+      end
 
       Rails.cache.fetch tag, &block
     end

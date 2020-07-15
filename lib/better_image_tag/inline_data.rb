@@ -19,10 +19,22 @@ module BetterImageTag
     def inline_data
       return image unless BetterImageTag.configuration.inlining_enabled
 
-      "data:#{content_type};base64,#{base64_contents}"
+      cache "inline_data:#{image}" do
+        "data:#{content_type};base64,#{base64_contents}"
+      end
     end
 
     private
+
+    def cache(tag, &block)
+      return unless block
+
+      unless BetterImageTag.configuration.cache_inlining_enabled
+        return block.call
+      end
+
+      Rails.cache.fetch tag, &block
+    end
 
     def content_type
       MimeMagic.by_magic(contents).type

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
-require "better_image_tag/version"
-require "better_image_tag/errors"
-require "better_image_tag/image_tag"
-require "better_image_tag/inline_data"
+
+require 'better_image_tag/version'
+require 'better_image_tag/errors'
+require 'better_image_tag/image_tag'
+require 'better_image_tag/inline_data'
 
 module BetterImageTag
   class << self
@@ -20,14 +21,16 @@ module BetterImageTag
 
   class Configuration
     attr_accessor(
-      :cache_enabled,
+      :cache_inlining_enabled,
+      :cache_sizing_enabled,
       :inlining_enabled,
       :require_alt_tags
     )
 
     def initialize
       @require_alt_tags = false
-      @cache_enabled = false
+      @cache_sizing_enabled = false
+      @cache_inlining_enabled = false
       @inlining_enabled = true
     end
   end
