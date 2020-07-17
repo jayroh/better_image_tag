@@ -4,6 +4,7 @@ require 'better_image_tag/version'
 require 'better_image_tag/errors'
 require 'better_image_tag/image_tag'
 require 'better_image_tag/inline_data'
+require 'better_image_tag/railtie' if defined?(Rails)
 
 module BetterImageTag
   class << self
@@ -24,7 +25,8 @@ module BetterImageTag
       :cache_inlining_enabled,
       :cache_sizing_enabled,
       :inlining_enabled,
-      :require_alt_tags
+      :require_alt_tags,
+      :images_path,
     )
 
     def initialize
@@ -32,6 +34,7 @@ module BetterImageTag
       @cache_sizing_enabled = false
       @cache_inlining_enabled = false
       @inlining_enabled = true
+      @images_path = "#{Rails.root}/app/assets/images"
     end
   end
 end

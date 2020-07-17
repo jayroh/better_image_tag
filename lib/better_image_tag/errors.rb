@@ -6,5 +6,6 @@ module BetterImageTag
 
     class MissingAltTag < Error; end
     class EarlyLazyLoad < Error; end
+    class ConvertNotFound < Error; end
   end
 end
