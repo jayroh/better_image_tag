@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'better_image_tag/convert_jpg_to_webp'
+require 'better_image_tag/commands/convert_jpg_to_webp'
 require 'fileutils'
 
-RSpec.describe BetterImageTag::ConvertJpgToWebp do
+RSpec.describe BetterImageTag::Commands::ConvertJpgToWebp do
   let(:converter) { described_class.new }
-  let(:asset_path) { File.expand_path('../fixtures/assets', __dir__) }
+  let(:asset_path) { File.expand_path('../../fixtures/assets', __dir__) }
 
   it 'loops through all jpg assets and creates webps' do
     allow(converter).to receive(:asset_path).and_return(asset_path)

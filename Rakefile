@@ -2,7 +2,10 @@
 
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
-import './lib/better_image_tag/tasks/convert_jpgs.rake'
+
+Dir.glob('./lib/better_image_tag/tasks/*.rake').each do |rake|
+  import rake
+end
 
 RSpec::Core::RakeTask.new(:spec)
 

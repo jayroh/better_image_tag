@@ -18,6 +18,8 @@ module BetterImageTag
       OpenURI::HTTPError
     ].freeze
 
+    CACHE_PREFIX = 'inline_data'
+
     def self.inline_data(image)
       new(image).inline_data
     end
@@ -31,7 +33,7 @@ module BetterImageTag
     def inline_data
       return image unless BetterImageTag.configuration.inlining_enabled
 
-      cache "inline_data:#{image}" do
+      cache "#{CACHE_PREFIX}:#{image}" do
         "data:#{content_type};base64,#{base64_contents}"
       end
     rescue *HTTP_ERRORS
