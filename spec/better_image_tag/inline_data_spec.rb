@@ -12,10 +12,12 @@ RSpec.describe BetterImageTag::InlineData do
   describe '.inline_data' do
     context 'when requesting external image' do
       it 'returns base64 encoded inline data' do
-        url = 'https://via.placeholder.com/1x1.png'
-        result = BetterImageTag::InlineData.inline_data(url)
+        VCR.use_cassette("remote_image") do
+          url = 'https://png-pixel.com/1x1-ff00007f.png'
+          result = BetterImageTag::InlineData.inline_data(url)
 
-        expect(result).to match(%r{data:image/png})
+          expect(result).to match(%r{data:image/png})
+        end
       end
     end
 

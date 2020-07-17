@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://png-pixel.com/1x1-ff00007f.png
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Fri, 17 Jul 2020 15:07:34 GMT
+      Content-Type:
+      - image/png
+      Content-Length:
+      - '70'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment
+      Expires:
+      - Thu, 31 Dec 2037 23:55:55 GMT
+      Cache-Control:
+      - max-age=315360000
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
+  recorded_at: Fri, 17 Jul 2020 15:07:34 GMT
+recorded_with: VCR 6.0.0

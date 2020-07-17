@@ -64,10 +64,12 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     it 'returns image tag with size when using a remote url' do
-      url = 'https://via.placeholder.com/1x1.png'
-      result = tag(image: url).with_size.to_s
+      VCR.use_cassette("remote_image") do
+        url = 'https://png-pixel.com/1x1-ff00007f.png'
+        result = tag(image: url).with_size.to_s
 
-      expect(result).to eq %(<img width="1" height="1" src="#{url}" />)
+        expect(result).to eq %(<img width="1" height="1" src="#{url}" />)
+      end
     end
 
     it "returns plain tag when remote url is 404'ing" do
