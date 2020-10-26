@@ -4,13 +4,15 @@ require 'fastimage'
 
 module BetterImageTag
   class ImageTag
-    attr_reader :request, :view_context, :options
+    TRANSPARENT_GIF = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='.freeze
+
+    attr_reader :view_context, :options, :images
     attr_accessor :image
 
-    def initialize(request, view_context, image, options = {})
-      @request = request
+    def initialize(view_context, image, options = {})
       @view_context = view_context
       @image = with_protocol(image)
+      @images = []
       @options = options.symbolize_keys
 
       enforce_requirements
@@ -33,7 +35,7 @@ module BetterImageTag
                        .to_h
                        .merge(src: view_context.image_path(image))
 
-      @image = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      @image = TRANSPARENT_GIF
 
       self
     end
@@ -43,7 +45,7 @@ module BetterImageTag
         raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
       end
 
-      @image = image.gsub(/\.[a-z]{2,}*\z/, '.webp') if accepts_webp?
+      @images << image.gsub(/\.[a-z]{2,}*\z/, '.webp')
 
       self
     end
@@ -55,17 +57,16 @@ module BetterImageTag
     end
 
     def to_s
-      view_context.image_tag(image, options.merge(super_options))
+      result = view_context.image_tag(image, options.merge(super_options))
+      return result if images.empty?
+
+      PictureTag.new(self, result).to_s
     end
 
     private
 
     def super_options
       { use_super: true }
-    end
-
-    def accepts_webp?
-      @_accepts_webp ||= request&.headers['HTTP_ACCEPT'].to_s.match?('image/webp')
     end
 
     def with_protocol(image)
@@ -102,6 +103,53 @@ module BetterImageTag
       end
 
       Rails.cache.fetch tag, &block
+    end
+
+    class PictureTag
+      attr_reader :image_tag, :default_image_tag
+
+      def initialize(image_tag, default_image_tag)
+        @image_tag = image_tag
+        @default_image_tag = default_image_tag
+      end
+
+      def to_s
+        lazily || normally
+      end
+
+      private
+
+      def lazily
+        return unless image_tag.image == ImageTag::TRANSPARENT_GIF
+
+        sources = image_tag.images.map do |image|
+          %Q{<source data-srcset="#{image_tag.view_context.image_path image}" type="image/webp">} if image.match? /webp$/
+        end.join("\n")
+
+        <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            #{sources}
+            <!--[if IE 9]></video><![endif]-->
+            #{default_image_tag}
+          </picture>
+        EOPICTURE
+      end
+
+      def normally
+        sources = image_tag.images.map do |image|
+          %Q{<source srcset="#{image_tag.view_context.image_path image}" type="image/webp">} if image.match? /webp$/
+        end.join("\n")
+
+        <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            #{sources}
+            <!--[if IE 9]></video><![endif]-->
+            #{default_image_tag}
+          </picture>
+        EOPICTURE
+      end
     end
   end
 end
