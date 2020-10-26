@@ -12,8 +12,8 @@ module BetterImageTag
     def initialize(view_context, image, options = {})
       @view_context = view_context
       @image = with_protocol(image)
-      @options = options.symbolize_keys
       @images = []
+      @options = options.symbolize_keys
 
       enforce_requirements
     end
@@ -65,16 +65,24 @@ module BetterImageTag
       BetterImageTag::PictureTag.new(self, result).to_s
     end
 
+    def picture_tag
+      PictureTag.new(self, result)
+    end
+
     private
+
+    def super_options
+      if images.any?
+        { use_picture: true }
+      else
+        { use_super: true }
+      end
+    end
 
     def lazy_load_last!
       return unless image.match?(/^data:/)
 
       raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
-    end
-
-    def super_options
-      { use_super: true }
     end
 
     def with_protocol(image)
