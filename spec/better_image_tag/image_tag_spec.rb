@@ -64,7 +64,7 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     it 'returns image tag with size when using a remote url' do
-      VCR.use_cassette("remote_image") do
+      VCR.use_cassette('remote_image') do
         url = 'https://png-pixel.com/1x1-ff00007f.png'
         result = tag(image: url).with_size.to_s
 
@@ -93,6 +93,15 @@ RSpec.describe BetterImageTag::ImageTag do
       result = tag(request: request).webp.to_s
 
       expect(result).to eq '<img src="/assets/1x1.gif" />'
+    end
+  end
+
+  describe '#inline' do
+    it 'inlines the contents of the target image' do
+      result = tag.inline.to_s
+      data = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
+      expect(result).to include %(src="#{data}")
     end
   end
 

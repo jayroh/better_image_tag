@@ -43,7 +43,13 @@ module BetterImageTag
         raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
       end
 
-      self.image = image.gsub(/\.[a-z]{2,}*\z/, '.webp') if accepts_webp?
+      @image = image.gsub(/\.[a-z]{2,}*\z/, '.webp') if accepts_webp?
+
+      self
+    end
+
+    def inline
+      @image = InlineData.new(@image).inline_data
 
       self
     end
