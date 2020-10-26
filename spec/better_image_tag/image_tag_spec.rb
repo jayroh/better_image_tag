@@ -93,7 +93,7 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     context 'when using webp *and* avif' do
-      it "returns both formats in source tags" do
+      it 'returns both formats in source tags' do
         result = tag.avif.webp.to_s
 
         expect(result).to eq <<~EOPICTURE
