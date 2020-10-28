@@ -71,6 +71,12 @@ module BetterImageTag
 
     private
 
+    def lazy_load_last!
+      return unless image.match?(/^data:/)
+
+      raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
+    end
+
     def super_options
       if images.any?
         { use_picture: true }
