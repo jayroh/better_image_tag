@@ -97,15 +97,15 @@ Examples - chainable methods on `image_tag`:
 ```
 <%= image_tag("http://example.com/file.jpg").with_size %>
 
-# => <img src="http://example.com/file.jpg" width="320" height="240" >
+# => <img src="http://example.com/file.jpg" width="320" height="240">
 ```
 
 * `#lazy_load`
 
 ```
-<%= image_tag("http://example.com/file.jpg").with_size %>
+<%= image_tag("http://example.com/file.jpg").lazy_load %>
 
-# => <img src="http://example.com/file.jpg" width="320" height="240" >
+# => <img class="lazyload" data-src="http://example.com/file.jpg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
 ```
 
 * `#webp`
@@ -113,7 +113,40 @@ Examples - chainable methods on `image_tag`:
 ```
 <%= image_tag("http://example.com/file.jpg").webp %>
 
-# => <img src="http://example.com/file.webp" width="320" height="240" >
+# => <picture>
+       <!--[if IE 9]><video style="display: none;"><![endif]-->
+       <source srcset="http://example.com/file.webp" type="image/webp">
+       <!--[if IE 9]></video><![endif]-->
+       <img src="http://example.com/file.jpg" />
+     </picture>
+
+```
+
+* `#avif`
+
+```
+<%= image_tag("http://example.com/file.jpg").avif %>
+
+# => <picture>
+       <!--[if IE 9]><video style="display: none;"><![endif]-->
+       <source srcset="http://example.com/file.avif" type="image/avif">
+       <!--[if IE 9]></video><![endif]-->
+       <img src="http://example.com/file.jpg" />
+     </picture>
+```
+
+* `#avif` *AND* `#webp` -- use them both!
+
+```
+<%= image_tag("http://example.com/file.jpg").avif.webp %>
+
+# => <picture>
+       <!--[if IE 9]><video style="display: none;"><![endif]-->
+       <source srcset="http://example.com/file.avif" type="image/avif">
+       <source srcset="http://example.com/file.webp" type="image/webp">
+       <!--[if IE 9]></video><![endif]-->
+       <img src="http://example.com/file.jpg" />
+     </picture>
 ```
 
 * `#inline`
@@ -126,7 +159,20 @@ Examples - chainable methods on `image_tag`:
 
 ## Rake task(s)
 
-TODO
+Included in this gem are a pair of rake tasks that will find all jpg's in your project and will convert them to webp's, or avif's, if you have the appropriate tooling available on your machine.
+
+```
+bundle exec rake better_image_tag:convert_jpgs_to_webp
+bundle exec rake better_image_tag:convert_jpgs_to_avif
+```
+
+For webp you will need [ImageMagick] installed. On Macs with [homebrew] you may install with `brew install imagemagick`.
+
+For avif you will need the `go-avif` tool, which has [binaries publicly available on their GitHub releases page].
+
+[ImageMagick]: https://imagemagick.org/index.php
+[homebrew]: https://brew.sh
+[binaries publicly available on their GitHub releases page]: https://github.com/Kagami/go-avif/releases
 
 ## Development
 
