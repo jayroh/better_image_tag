@@ -60,6 +60,30 @@ end
 
 ## Usage
 
+Add the controller concern to the controllers where you would like to use
+`better_image_tag`:
+
+```
+class HomepageController < ApplicationController
+  include BetterImageTag::ImageTaggable
+end
+```
+
+Optionally, you can further constrain usage with a `better_image_tag` class
+method. This is useful for scenarios where you want to use the features for
+one action only:
+
+```
+class HomepageController < ApplicationController
+  include BetterImageTag::ImageTaggable
+
+  better_image_tag if: :needs_better_image_tags?
+  better_image_tag unless: :we_dont?
+end
+```
+
+## Features
+
 `better_image_tag`, by default, keeps the stock `image_tag` implementation
 but extends it with chainable methods that will mutate the contents of
 the generated `<img/>` tag. This is done purposefully to allow you to keep
