@@ -8,6 +8,8 @@
 /doc/
 /pkg/
 /spec/reports/
+/spec/dummy/log/*
+/spec/dummy/tmp/*
 /tmp/
 /gemfiles/*.lock
 /gemfiles/.bundle

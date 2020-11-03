@@ -4,7 +4,9 @@ require 'better_image_tag/version'
 require 'better_image_tag/errors'
 require 'better_image_tag/picture_tag'
 require 'better_image_tag/image_tag'
+require 'better_image_tag/base_image_tag'
 require 'better_image_tag/inline_data'
+require 'better_image_tag/image_taggable'
 require 'better_image_tag/railtie' if defined?(Rails)
 
 module BetterImageTag
@@ -27,7 +29,7 @@ module BetterImageTag
       :cache_sizing_enabled,
       :inlining_enabled,
       :require_alt_tags,
-      :images_path,
+      :images_path
     )
 
     def initialize
