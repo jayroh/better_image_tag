@@ -20,7 +20,9 @@ module BetterImageTag
     end
 
     def image_tag(image, options = {})
-      return super if options.delete(:use_super)
+      if options.delete(:use_super)
+        return ActionController::Base.helpers.image_tag(image, options)
+      end
 
       better_image_tag = better_image_tag_not_allowed? ?
         BetterImageTag::BaseImageTag.new(self, image, options) :
