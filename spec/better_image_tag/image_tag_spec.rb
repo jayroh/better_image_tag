@@ -92,8 +92,24 @@ RSpec.describe BetterImageTag::ImageTag do
       EOPICTURE
     end
 
-    context "when lazily loading" do
-      it "does its lazy loading thing" do
+    context 'when using webp *and* avif' do
+      it "returns both formats in source tags" do
+        result = tag.avif.webp.to_s
+
+        expect(result).to eq <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source srcset="/assets/1x1.avif" type="image/avif">
+          <source srcset="/assets/1x1.webp" type="image/webp">
+            <!--[if IE 9]></video><![endif]-->
+            <img src="/assets/1x1.gif" />
+          </picture>
+        EOPICTURE
+      end
+    end
+
+    context 'when lazily loading' do
+      it 'does its lazy loading thing' do
         result = tag.webp.lazy_load.to_s
         data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
