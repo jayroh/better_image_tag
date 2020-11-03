@@ -4,14 +4,16 @@ require 'fastimage'
 
 module BetterImageTag
   class ImageTag
-    attr_reader :request, :view_context, :options
+    TRANSPARENT_GIF = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
+    attr_reader :view_context, :options, :images
     attr_accessor :image
 
-    def initialize(request, view_context, image, options = {})
-      @request = request
+    def initialize(view_context, image, options = {})
       @view_context = view_context
       @image = with_protocol(image)
       @options = options.symbolize_keys
+      @images = []
 
       enforce_requirements
     end
@@ -33,18 +35,20 @@ module BetterImageTag
                        .to_h
                        .merge(src: view_context.image_path(image))
 
-      @image = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      @image = TRANSPARENT_GIF
 
       self
     end
 
     def webp
-      if image.match?(/^data:/)
-        raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
-      end
+      lazy_load_last!
+      @images << image.gsub(/\.[a-z]{2,}*\z/, '.webp')
+      self
+    end
 
-      @image = image.gsub(/\.[a-z]{2,}*\z/, '.webp') if accepts_webp?
-
+    def avif
+      lazy_load_last!
+      @images << image.gsub(/\.[a-z]{2,}*\z/, '.avif')
       self
     end
 
@@ -55,17 +59,22 @@ module BetterImageTag
     end
 
     def to_s
-      view_context.image_tag(image, options.merge(super_options))
+      result = view_context.image_tag(image, options.merge(super_options))
+      return result if images.empty?
+
+      BetterImageTag::PictureTag.new(self, result).to_s
     end
 
     private
 
-    def super_options
-      { use_super: true }
+    def lazy_load_last!
+      return unless image.match?(/^data:/)
+
+      raise EarlyLazyLoad, 'Run lazy_load as the last method in chain'
     end
 
-    def accepts_webp?
-      @_accepts_webp ||= request&.headers['HTTP_ACCEPT'].to_s.match?('image/webp')
+    def super_options
+      { use_super: true }
     end
 
     def with_protocol(image)
@@ -97,9 +106,7 @@ module BetterImageTag
     def cache(tag, &block)
       return unless block
 
-      unless BetterImageTag.configuration.cache_sizing_enabled
-        return block.call
-      end
+      return block.call unless BetterImageTag.configuration.cache_sizing_enabled
 
       Rails.cache.fetch tag, &block
     end

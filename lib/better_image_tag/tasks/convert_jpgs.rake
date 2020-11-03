@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'better_image_tag/commands/convert_jpg_to_webp'
+require 'better_image_tag/commands/convert_jpg_to_avif'
 
 namespace :better_image_tag do
   desc 'Convert jpgs to webp'

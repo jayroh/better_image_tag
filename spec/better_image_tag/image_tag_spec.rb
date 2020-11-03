@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe BetterImageTag::ImageTag do
-  let(:default_request) { double('request', headers: {}) }
-
   let(:view_context) do
     view_paths = ActionController::Base.view_paths
     lookup_context = ActionView::LookupContext.new(view_paths)
@@ -81,18 +79,49 @@ RSpec.describe BetterImageTag::ImageTag do
   end
 
   describe '#webp' do
-    it 'returns the webp version of an image when browser supports it' do
-      request = double('request', headers: { 'HTTP_ACCEPT' => 'image/webp' })
-      result = tag(request: request).webp.to_s
+    it 'returns picture tag with webp in a source/srcset' do
+      result = tag.webp.to_s
 
-      expect(result).to eq '<img src="/assets/1x1.webp" />'
+      expect(result).to eq <<~EOPICTURE
+        <picture>
+          <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source srcset="/assets/1x1.webp" type="image/webp">
+          <!--[if IE 9]></video><![endif]-->
+          <img src="/assets/1x1.gif" />
+        </picture>
+      EOPICTURE
     end
 
-    it "doesn't return webp version of image when browser doesn't support it" do
-      request = double('request', headers: { 'HTTP_ACCEPT' => 'image/gif' })
-      result = tag(request: request).webp.to_s
+    context 'when using webp *and* avif' do
+      it "returns both formats in source tags" do
+        result = tag.avif.webp.to_s
 
-      expect(result).to eq '<img src="/assets/1x1.gif" />'
+        expect(result).to eq <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source srcset="/assets/1x1.avif" type="image/avif">
+          <source srcset="/assets/1x1.webp" type="image/webp">
+            <!--[if IE 9]></video><![endif]-->
+            <img src="/assets/1x1.gif" />
+          </picture>
+        EOPICTURE
+      end
+    end
+
+    context 'when lazily loading' do
+      it 'does its lazy loading thing' do
+        result = tag.webp.lazy_load.to_s
+        data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
+        expect(result).to eq <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source data-srcset="/assets/1x1.webp" type="image/webp">
+            <!--[if IE 9]></video><![endif]-->
+            <img class="lazyload" data-src="/assets/1x1.gif" src="#{data}" />
+          </picture>
+        EOPICTURE
+      end
     end
   end
 
@@ -121,8 +150,8 @@ RSpec.describe BetterImageTag::ImageTag do
     end
   end
 
-  def tag(request: default_request, image: '1x1.gif', options: {})
-    described_class.new(request, view_context, image, options).tap do |tag|
+  def tag(image: '1x1.gif', options: {})
+    described_class.new(view_context, image, options).tap do |tag|
       allow(tag).to receive(:super_options).and_return({})
     end
   end
