@@ -3,6 +3,7 @@
 require 'better_image_tag/version'
 require 'better_image_tag/errors'
 require 'better_image_tag/picture_tag'
+require 'better_image_tag/svg_tag'
 require 'better_image_tag/image_tag'
 require 'better_image_tag/base_image_tag'
 require 'better_image_tag/inline_data'

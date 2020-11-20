@@ -59,17 +59,35 @@ module BetterImageTag
     end
 
     def to_s
-      result = view_context.image_tag(image, options.merge(super_options))
-      return result if images.empty?
-
-      BetterImageTag::PictureTag.new(self, result).to_s
+      svg_string || image_tag_string || picture_tag_string
     end
 
     def picture_tag
+      result = view_context.image_tag(image, options.merge(super_options))
       PictureTag.new(self, result)
     end
 
     private
+
+    def svg_string
+      return unless svg?
+
+      SvgTag.new(self).to_s
+    end
+
+    def image_tag_string
+      return if images.any?
+
+      view_context.image_tag(image, options.merge(super_options))
+    end
+
+    def picture_tag_string
+      picture_tag.to_s
+    end
+
+    def svg?
+      MimeMagic.by_magic(@image)&.type == 'image/svg+xml'
+    end
 
     def super_options
       if images.any?

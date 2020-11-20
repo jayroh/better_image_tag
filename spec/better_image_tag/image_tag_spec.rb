@@ -132,6 +132,23 @@ RSpec.describe BetterImageTag::ImageTag do
 
       expect(result).to include %(src="#{data}")
     end
+
+    context 'when the image is an SVG' do
+      it "inlines the svg directly without an image tag" do
+        result = tag(image: 'sample.svg').inline.to_s
+
+        expect(result).to start_with "<svg "
+      end
+
+      it "adds width and height to the inlined svg " do
+        result = tag(
+          image: 'sample.svg',
+          options: { width: 10, height: 10 }
+        ).inline.to_s
+
+        expect(result).to start_with %(<svg width="10" height="10")
+      end
+    end
   end
 
   context 'when requiring alt tags for all images' do

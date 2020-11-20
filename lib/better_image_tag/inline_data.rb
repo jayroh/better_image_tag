@@ -34,7 +34,7 @@ module BetterImageTag
       return image unless BetterImageTag.configuration.inlining_enabled
 
       cache "#{CACHE_PREFIX}:#{image}" do
-        "data:#{content_type};base64,#{base64_contents}"
+        svg? ? contents : "data:#{content_type};base64,#{base64_contents}"
       end
     rescue *HTTP_ERRORS
       image
@@ -50,6 +50,10 @@ module BetterImageTag
       end
 
       Rails.cache.fetch tag, &block
+    end
+
+    def svg?
+      content_type == "image/svg+xml"
     end
 
     def content_type
