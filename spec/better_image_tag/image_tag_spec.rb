@@ -148,6 +148,15 @@ RSpec.describe BetterImageTag::ImageTag do
 
         expect(result).to start_with %(<svg width="10" height="10")
       end
+
+      it "adds css class to the inlined svg" do
+        result = tag(
+          image: 'sample.svg',
+          options: { class: "logo" }
+        ).inline.to_s
+
+        expect(result).to start_with %(<svg class="logo")
+      end
     end
   end
 

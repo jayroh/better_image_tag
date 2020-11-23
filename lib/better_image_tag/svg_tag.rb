@@ -12,6 +12,10 @@ module BetterImageTag
       image_tag.image.gsub!(/^\<svg /, %(<svg height="#{height}" )) if height
       image_tag.image.gsub!(/^\<svg /, %(<svg width="#{width}" )) if width
 
+      if css_class
+        image_tag.image.gsub!(/^\<svg /, %(<svg class="#{css_class}" ))
+      end
+
       image_tag.image
     end
 
@@ -23,6 +27,10 @@ module BetterImageTag
 
     def height
       image_tag.options[:height]
+    end
+
+    def css_class
+      image_tag.options[:class]
     end
   end
 end

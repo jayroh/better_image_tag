@@ -9,6 +9,9 @@ app/site work-flow that are addressable via common boilerplate code that
 * Using a webp version of an image if the browser supports it.
 * A rake task that will generate webp versions of all jpg's in your app.
 * Ability to inline contents of an image as a base64 encoded string.
+* Inlining SVG's will output the contents of the SVG image instead of using img
+  tag and its base64 encoded data. This also allows for width, height, and
+  class properties to be applied to the root SVG tag.
 * In conjunction with the excellent [lazysizes] JS library, lazy-loading
   of images.
 * Fetching dimensions of, typically, user-generated image content and
