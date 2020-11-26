@@ -59,7 +59,7 @@ module BetterImageTag
     end
 
     def to_s
-      svg_string || image_tag_string || picture_tag_string
+      (svg_string || image_tag_string || picture_tag_string).html_safe
     end
 
     def picture_tag

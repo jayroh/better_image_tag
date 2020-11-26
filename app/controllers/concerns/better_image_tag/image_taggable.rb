@@ -25,11 +25,11 @@ module BetterImageTag
       end
 
       better_image_tag = better_image_tag_not_allowed? ?
-        BetterImageTag::BaseImageTag.new(self, image, options) :
-        BetterImageTag::ImageTag.new(self, image, options)
+        BetterImageTag::BaseImageTag.new(view_context, image, options) :
+        BetterImageTag::ImageTag.new(view_context, image, options)
 
       if options.delete(:use_picture)
-        return better_image_tag.picture_tag.to_s.html_safe
+        return better_image_tag.picture_tag.to_s
       end
 
       better_image_tag
