@@ -40,15 +40,15 @@ module BetterImageTag
       self
     end
 
-    def webp
+    def webp(url = nil)
       lazy_load_last!
-      @images << image.gsub(/\.[a-z]{2,}*\z/, '.webp')
+      @images << (url || image.gsub(/\.[a-z]{2,}*\z/, '.webp'))
       self
     end
 
-    def avif
+    def avif(url = nil)
       lazy_load_last!
-      @images << image.gsub(/\.[a-z]{2,}*\z/, '.avif')
+      @images << (url || image.gsub(/\.[a-z]{2,}*\z/, '.avif'))
       self
     end
 

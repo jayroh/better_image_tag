@@ -92,6 +92,19 @@ RSpec.describe BetterImageTag::ImageTag do
       EOPICTURE
     end
 
+    it 'uses the passed in webp url' do
+      result = tag.webp('http://example.com/another.webp').to_s
+
+      expect(result).to eq <<~EOPICTURE
+        <picture>
+          <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source srcset="http://example.com/another.webp" type="image/webp">
+          <!--[if IE 9]></video><![endif]-->
+          <img src="/assets/1x1.gif" />
+        </picture>
+      EOPICTURE
+    end
+
     context 'when using webp *and* avif' do
       it 'returns both formats in source tags' do
         result = tag.avif.webp.to_s
