@@ -6,8 +6,8 @@ necessarily, but there are opportunities for improvement in the typical web
 app/site work-flow that are addressable via common boilerplate code that
 -- we hope -- is wrapped up nicely into this gem. Namely:
 
-* Using a webp version of an image if the browser supports it.
-* A rake task that will generate webp versions of all jpg's in your app.
+* Using webp or avif versions of an image if the browser supports it.
+* A rake task that will generate webp or avif versions of all jpg's in your app.
 * Ability to inline contents of an image as a base64 encoded string.
 * Inlining SVG's will output the contents of the SVG image instead of using img
   tag and its base64 encoded data. This also allows for width, height, and
@@ -123,6 +123,16 @@ Examples - chainable methods on `image_tag`:
        <img src="http://example.com/file.jpg" />
      </picture>
 
+# OPTIONAL -- pass url to where another WEBP is:
+
+<%= image_tag("http://example.com/file.jpg").webp("https://some.other-cdn.com/file.webp") %>
+
+# => <picture>
+       <!--[if IE 9]><video style="display: none;"><![endif]-->
+       <source srcset="https://some.other-cdn.com/file.webp" type="image/webp">
+       <!--[if IE 9]></video><![endif]-->
+       <img src="http://example.com/file.jpg" />
+     </picture>
 ```
 
 * `#avif`
@@ -133,6 +143,17 @@ Examples - chainable methods on `image_tag`:
 # => <picture>
        <!--[if IE 9]><video style="display: none;"><![endif]-->
        <source srcset="http://example.com/file.avif" type="image/avif">
+       <!--[if IE 9]></video><![endif]-->
+       <img src="http://example.com/file.jpg" />
+     </picture>
+
+# OPTIONAL -- pass url to where another AVIF is:
+
+<%= image_tag("http://example.com/file.jpg").avif("https://some.other-cdn.com/file.avif") %>
+
+# => <picture>
+       <!--[if IE 9]><video style="display: none;"><![endif]-->
+       <source srcset="https://some.other-cdn.com/file.avif" type="image/avif">
        <!--[if IE 9]></video><![endif]-->
        <img src="http://example.com/file.jpg" />
      </picture>
