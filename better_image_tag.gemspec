@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 lib = File.expand_path('lib', __dir__)
-app = File.expand_path('app/controllers/concerns', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-$LOAD_PATH.unshift(app) unless $LOAD_PATH.include?(app)
 
 require 'better_image_tag/version'
 

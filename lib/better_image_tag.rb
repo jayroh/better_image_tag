@@ -7,7 +7,7 @@ require 'better_image_tag/svg_tag'
 require 'better_image_tag/image_tag'
 require 'better_image_tag/base_image_tag'
 require 'better_image_tag/inline_data'
-require 'better_image_tag/image_taggable'
+require_relative '../app/controllers/concerns/better_image_tag/image_taggable'
 require 'better_image_tag/railtie' if defined?(Rails)
 
 module BetterImageTag
