@@ -85,6 +85,23 @@ class HomepageController < ApplicationController
 end
 ```
 
+Furthermore, sometimes there are view partials shared across some controllers
+that _do_ use `better_image_tag` and some that _do not_. In that case, you
+would want to ensure that the endpoints/controllers pulling those partials in
+will still function when the chained methods are called. In this case you can
+"disable" the better_image_tag functionality explicitly in the controller that
+is not using it:
+
+
+```
+class AnotherController < ApplicationController
+  include BetterImageTag::ImageTaggable
+
+  # explicitly pass through chained methods to default behavior
+  better_image_tag disabled: true
+end
+```
+
 ## Features
 
 `better_image_tag`, by default, keeps the stock `image_tag` implementation
@@ -197,6 +214,41 @@ For avif you will need the `go-avif` tool, which has [binaries publicly availabl
 [ImageMagick]: https://imagemagick.org/index.php
 [homebrew]: https://brew.sh
 [binaries publicly available on their GitHub releases page]: https://github.com/Kagami/go-avif/releases
+
+## Testing
+
+If you use RSpec and utilize view specs, we have provided a helper you may add to `rails_helper.rb` that
+will allow your view specs to use, or disable, the `better_image_tag` functionality. In `rails_helper.rb`,
+add the following:
+
+```ruby
+require "better_image_tag/rspec"
+
+RSpec.configure do |config|
+  # ...
+  config.include BetterImageTag::ViewSpecHelpers, type: :view
+  # ...
+```
+
+In your spec(s) you can enable or disable the functionality with either `better_image_tag_behavior` or `default_image_tag_behavior`.
+For example:
+
+```ruby
+require "rails_helper"
+
+RSpec.describe "home/index.html.erb", type: :view do
+  it "renders main partial with inlined logo image" do
+    better_image_tag_behavior
+
+    # to use default `image_tag` behavior:
+    # default_image_tag_behavior
+
+    render
+
+    expect(rendered).to render_template("shared/_header")
+    # expect(rendered).to have_inlined_logo
+  end
+```
 
 ## Development
 
