@@ -11,7 +11,7 @@ module BetterImageTag
 
       def better_image_tag(better_image_tag_options = {})
         @better_image_tag_options = better_image_tag_options
-          .with_indifferent_access
+                                    .with_indifferent_access
       end
     end
 
@@ -20,30 +20,29 @@ module BetterImageTag
     end
 
     def image_tag(image, options = {})
-      if options.delete(:use_super)
-        return ActionController::Base.helpers.image_tag(image, options)
-      end
+      return ActionController::Base.helpers.image_tag(image, options) if options.delete(:use_super)
 
-      better_image_tag = better_image_tag_not_allowed? ?
-        BetterImageTag::BaseImageTag.new(view_context, image, options) :
-        BetterImageTag::ImageTag.new(view_context, image, options)
+      better_image_tag = if better_image_tag_allowed?
+                           BetterImageTag::ImageTag.new(view_context, image, options)
+                         else
+                           BetterImageTag::BaseImageTag.new(view_context, image, options)
+                         end
 
-      if options.delete(:use_picture)
-        return better_image_tag.picture_tag.to_s
-      end
+      return better_image_tag.picture_tag.to_s if options.delete(:use_picture)
 
       better_image_tag
     end
 
     private
 
-    def better_image_tag_not_allowed?
+    def better_image_tag_allowed?
       options = self.class.better_image_tag_options || {}
 
-      return !send(options[:if]) if options[:if]
-      return send(options[:unless]) if options[:unless]
+      return send(options[:if]) if options[:if].present?
+      return !send(options[:unless]) if options[:unless].present?
+      return !options[:disabled] if options[:disabled].present?
 
-      false
+      true
     end
   end
 end

@@ -29,6 +29,26 @@ RSpec.describe BetterImageTagController, type: :controller do
     end
   end
 
+  context 'when the concern is included and disabled' do
+    controller do
+      include BetterImageTag::ImageTaggable
+
+      better_image_tag disabled: true
+
+      def index
+        render plain: image_tag('1x1.jpg').lazy_load
+      end
+    end
+
+    it 'uses stock image tag when using better_image_tag features' do
+      routes.draw { get 'index' => 'better_image_tag#index' }
+
+      get :index
+
+      expect(response.body).to eq '<img src="/assets/1x1.jpg" />'
+    end
+  end
+
   context 'when the concern is included' do
     controller do
       include BetterImageTag::ImageTaggable
