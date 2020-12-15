@@ -223,7 +223,7 @@ If you use RSpec we have provided some helpers that you may add to `rails_helper
 will allow your specs to:
 
 1. For all specs -- turn the inlining or size fetching features off.
-2. For view specs -- use, or disable, the `better_image_tag` functionality.
+2. For helper or view specs -- configure the `better_image_tag` functionality per test.
 
 
 In `rails_helper.rb`,
@@ -236,6 +236,7 @@ RSpec.configure do |config|
   # ...
   config.include BetterImageTag::SpecHelpers
   config.include BetterImageTag::ViewSpecHelpers, type: :view
+  config.include BetterImageTag::ViewSpecHelpers, type: :helper
   # ...
 ```
 
@@ -246,23 +247,28 @@ disable_better_image_tag_sizing!
 disable_better_image_tag_inlining!
 ```
 
-In your _view_ spec(s) you can enable or disable the functionality with either
-`better_image_tag_behavior` or `default_image_tag_behavior`. For example:
+In your _view_ or _helper_ spec(s) you can configure the functionality with the same
+options you can pass through the controller class method. For example:
 
 ```ruby
 require "rails_helper"
 
 RSpec.describe "home/index.html.erb", type: :view do
   it "renders main partial with inlined logo image" do
-    better_image_tag_behavior
-
-    # to use default `image_tag` behavior:
-    # default_image_tag_behavior
+    better_image_tag
 
     render
 
     expect(rendered).to render_template("shared/_header")
     # expect(rendered).to have_inlined_logo
+  end
+
+  it "renders default image tag" do
+    better_image_tag disabled: true
+
+    render
+
+    # ... assertions here.
   end
 ```
 

@@ -10,24 +10,13 @@ module BetterImageTag
   end
 
   module ViewSpecHelpers
-    def better_image_tag_behavior
+    def better_image_tag(options = {})
       view.send(:extend, BetterImageTag::ImageTaggable)
 
       without_partial_double_verification do
         allow(view.class).
           to receive(:better_image_tag_options).
-          and_return({})
-        allow(view).to receive(:view_context).and_return(view)
-      end
-    end
-
-    def default_image_tag_behavior
-      view.send(:extend, BetterImageTag::ImageTaggable)
-
-      without_partial_double_verification do
-        allow(view.class).
-          to receive(:better_image_tag_options).
-          and_return({ disabled: true })
+          and_return(options)
         allow(view).to receive(:view_context).and_return(view)
       end
     end
