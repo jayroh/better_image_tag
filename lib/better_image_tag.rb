@@ -30,6 +30,7 @@ module BetterImageTag
       :cache_sizing_enabled,
       :inlining_enabled,
       :require_alt_tags,
+      :sizing_enabled,
       :images_path
     )
 
@@ -38,6 +39,7 @@ module BetterImageTag
       @cache_sizing_enabled = false
       @cache_inlining_enabled = false
       @inlining_enabled = true
+      @sizing_enabled = true
       @images_path = "#{Rails.root}/app/assets/images"
     end
   end

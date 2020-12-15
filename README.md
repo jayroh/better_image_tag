@@ -49,6 +49,7 @@ BetterImageTag.configure do |config|
   config.cache_sizing_enabled   = false
   config.images_path            = "#{Rails.root}/app/assets/images"
   config.inlining_enabled       = true
+  config.sizing_enabled         = true
   config.require_alt_tags       = false
 end
 ```
@@ -57,6 +58,7 @@ end
 * `cache_sizing_enabled` uses Rails' cache for the width and height dimensions of an images path/url.
 * `images_path` points to the base image assets' path in your application.
 * `inlining_enabled` turns the inlining mechanism on or off.
+* `sizing_enabled` turns the image size fetching mechanism on or off.
 * `require_alt_tags`, when set to true, will raise an exception if an image tag does not have an alt attribute set. [Adding alternative text to photos is first and foremost a principle of web accessibility]. This helps enforce usage of alt tags in an effort to increase web accessibility.
 
 [Adding alternative text to photos is first and foremost a principle of web accessibility]: https://moz.com/learn/seo/alt-text
@@ -217,8 +219,14 @@ For avif you will need the `go-avif` tool, which has [binaries publicly availabl
 
 ## Testing
 
-If you use RSpec and utilize view specs, we have provided a helper you may add to `rails_helper.rb` that
-will allow your view specs to use, or disable, the `better_image_tag` functionality. In `rails_helper.rb`,
+If you use RSpec we have provided some helpers that you may add to `rails_helper.rb` that
+will allow your specs to:
+
+1. For all specs -- turn the inlining or size fetching features off.
+2. For view specs -- use, or disable, the `better_image_tag` functionality.
+
+
+In `rails_helper.rb`,
 add the following:
 
 ```ruby
@@ -226,12 +234,20 @@ require "better_image_tag/rspec"
 
 RSpec.configure do |config|
   # ...
+  config.include BetterImageTag::SpecHelpers
   config.include BetterImageTag::ViewSpecHelpers, type: :view
   # ...
 ```
 
-In your spec(s) you can enable or disable the functionality with either `better_image_tag_behavior` or `default_image_tag_behavior`.
-For example:
+In any of your specs you may disable inlining or sizing with the following helper methods:
+
+```ruby
+disable_better_image_tag_sizing!
+disable_better_image_tag_inlining!
+```
+
+In your _view_ spec(s) you can enable or disable the functionality with either
+`better_image_tag_behavior` or `default_image_tag_behavior`. For example:
 
 ```ruby
 require "rails_helper"

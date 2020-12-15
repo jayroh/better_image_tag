@@ -1,4 +1,14 @@
 module BetterImageTag
+  module SpecHelpers
+    def disable_better_image_tag_sizing!
+      BetterImageTag.configuration.sizing_enabled = false
+    end
+
+    def disable_better_image_tag_inlining!
+      BetterImageTag.configuration.inlining_enabled = false
+    end
+  end
+
   module ViewSpecHelpers
     def better_image_tag_behavior
       view.send(:extend, BetterImageTag::ImageTaggable)
