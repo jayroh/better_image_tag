@@ -87,7 +87,7 @@ RSpec.describe BetterImageTag::ImageTag do
           <!--[if IE 9]><video style="display: none;"><![endif]-->
           <source srcset="/assets/1x1.webp" type="image/webp">
           <!--[if IE 9]></video><![endif]-->
-          <img src="/assets/1x1.gif" />
+          <img use_super="true" src="/assets/1x1.gif" />
         </picture>
       EOPICTURE
     end
@@ -100,7 +100,7 @@ RSpec.describe BetterImageTag::ImageTag do
           <!--[if IE 9]><video style="display: none;"><![endif]-->
           <source srcset="http://example.com/another.webp" type="image/webp">
           <!--[if IE 9]></video><![endif]-->
-          <img src="/assets/1x1.gif" />
+          <img use_super="true" src="/assets/1x1.gif" />
         </picture>
       EOPICTURE
     end
@@ -115,7 +115,7 @@ RSpec.describe BetterImageTag::ImageTag do
             <source srcset="/assets/1x1.avif" type="image/avif">
           <source srcset="/assets/1x1.webp" type="image/webp">
             <!--[if IE 9]></video><![endif]-->
-            <img src="/assets/1x1.gif" />
+            <img use_super="true" src="/assets/1x1.gif" />
           </picture>
         EOPICTURE
       end
@@ -131,7 +131,7 @@ RSpec.describe BetterImageTag::ImageTag do
             <!--[if IE 9]><video style="display: none;"><![endif]-->
             <source data-srcset="/assets/1x1.webp" type="image/webp">
             <!--[if IE 9]></video><![endif]-->
-            <img class="lazyload" data-src="/assets/1x1.gif" src="#{data}" />
+            <img class="lazyload" data-src="/assets/1x1.gif" use_super="true" src="#{data}" />
           </picture>
         EOPICTURE
       end

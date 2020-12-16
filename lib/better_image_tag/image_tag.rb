@@ -64,7 +64,7 @@ module BetterImageTag
     end
 
     def picture_tag
-      result = view_context.image_tag(image, options.merge(super_options))
+      result = view_context.image_tag(image, options.merge(use_super: true))
       PictureTag.new(self, result)
     end
 
