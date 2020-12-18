@@ -8,5 +8,6 @@ module BetterImageTag
     class EarlyLazyLoad < Error; end
     class ConvertNotFound < Error; end
     class AvifNotFound < Error; end
+    class FileNotFound < Error; end
   end
 end

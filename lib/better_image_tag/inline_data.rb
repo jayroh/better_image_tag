@@ -72,7 +72,17 @@ module BetterImageTag
         elsif not_compiled?
           Rails.application.assets[image].to_s
         else
-          Rails.application.assets_manifest.find_images(image).first
+          file = Rails.application.assets_manifest.assets[image]
+
+          if file.nil?
+            raise(
+              BetterImageTag::Errors::FileNotFound,
+              "Not found in asset manifest: #{image}"
+            )
+          end
+
+          path = File.join(Rails.application.assets_manifest.directory, file)
+          File.read(path)
         end
       end
     end
