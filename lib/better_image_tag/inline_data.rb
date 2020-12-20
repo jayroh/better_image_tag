@@ -20,14 +20,15 @@ module BetterImageTag
 
     CACHE_PREFIX = 'inline_data'
 
-    def self.inline_data(image)
-      new(image).inline_data
+    def self.inline_data(*args)
+      new(*args).inline_data
     end
 
     attr_reader :image
 
-    def initialize(image)
+    def initialize(image, local_file: false)
       @image = image
+      @local_file = local_file
     end
 
     def inline_data
@@ -69,6 +70,8 @@ module BetterImageTag
       @_contents ||= begin
         if image.match?(%r{https?://})
           open(image).read
+        elsif local_file?
+          File.read(image)
         elsif not_compiled?
           Rails.application.assets[image].to_s
         else
@@ -90,6 +93,10 @@ module BetterImageTag
 
     def not_compiled?
       Rails.env.development? || Rails.env.test?
+    end
+
+    def local_file?
+      @local_file
     end
   end
 end

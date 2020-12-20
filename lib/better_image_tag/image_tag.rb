@@ -110,7 +110,7 @@ module BetterImageTag
 
     def asset
       @_asset ||= begin
-        if image.match?(%r{https?://})
+        if image.match?(%r{https?://}) || !Object.const_defined?(:Rails)
           image
         elsif not_compiled?
           Rails.application.assets[image].filename

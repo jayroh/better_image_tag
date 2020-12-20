@@ -8,7 +8,7 @@ require 'better_image_tag/image_tag'
 require 'better_image_tag/base_image_tag'
 require 'better_image_tag/inline_data'
 require_relative '../app/controllers/concerns/better_image_tag/image_taggable'
-require 'better_image_tag/railtie' if defined?(Rails)
+require 'better_image_tag/railtie' if Object.const_defined?(:Rails)
 
 module BetterImageTag
   class << self
@@ -40,7 +40,13 @@ module BetterImageTag
       @cache_inlining_enabled = false
       @inlining_enabled = true
       @sizing_enabled = true
-      @images_path = "#{Rails.root}/app/assets/images"
+      @images_path = "#{rails_root}/app/assets/images"
+    end
+
+    private
+
+    def rails_root
+      Object.const_defined?(:Rails) ? Rails.root : '.'
     end
   end
 end
