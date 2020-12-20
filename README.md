@@ -16,6 +16,9 @@ app/site work-flow that are addressable via common boilerplate code that
   of images.
 * Fetching dimensions of, typically, user-generated image content and
   applying width and height properties to the image tag
+* An `inlineable` executable is provided for cases where you're not working
+  with Rails and just need a tool to output the base64 data url for images or
+  css.
 
 Everything above is in service of making web pages render faster. If you're
 familiar with [Google's lighthouse page speed tool], or [WebPageTest], then
@@ -102,6 +105,18 @@ class AnotherController < ApplicationController
   # explicitly pass through chained methods to default behavior
   better_image_tag disabled: true
 end
+```
+
+## CLI usage
+
+There is an `inlineable` cli that will accept the path to a local image and will
+output a base64 data url that can be used in your image `src`, or css `url()`
+properties.
+
+Example:
+
+```sh
+inlineable ./path/to/image.jpg
 ```
 
 ## Features
