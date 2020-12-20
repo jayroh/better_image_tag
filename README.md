@@ -116,7 +116,8 @@ properties.
 Example:
 
 ```sh
-inlineable ./path/to/image.jpg
+$ inlineable ./path/to/image.jpg
+data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGB ... a whole lot o' letters & numbers
 ```
 
 ## Features
