@@ -26,19 +26,26 @@ module BetterImageTag
 
       srcset = loading_style == :lazily ? 'data-srcset' : 'srcset'
 
+      css_class = css_class? ? %( class="#{image_tag.options[:class]}") : ''
+
       sources = images.map do |image|
         type = image.match?(/webp$/) ? 'webp' : 'avif'
         %(<source #{srcset}="#{image_path image}" type="image/#{type}">)
       end.join("\n")
 
+
       <<~EOPICTURE
-        <picture>
+        <picture#{css_class}>
           <!--[if IE 9]><video style="display: none;"><![endif]-->
           #{sources}
           <!--[if IE 9]></video><![endif]-->
           #{default_image_tag}
         </picture>
       EOPICTURE
+    end
+
+    def css_class?
+      image_tag.options[:class].present?
     end
   end
 end

@@ -127,7 +127,7 @@ RSpec.describe BetterImageTag::ImageTag do
         data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
         expect(result).to eq <<~EOPICTURE
-          <picture>
+          <picture class="lazyload">
             <!--[if IE 9]><video style="display: none;"><![endif]-->
             <source data-srcset="/assets/1x1.webp" type="image/webp">
             <!--[if IE 9]></video><![endif]-->
