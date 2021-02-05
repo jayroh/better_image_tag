@@ -26,7 +26,7 @@ module BetterImageTag
 
       srcset = loading_style == :lazily ? 'data-srcset' : 'srcset'
 
-      css_class = css_class? ? %( class="#{image_tag.options[:class]}") : ''
+      css_class = css_class? ? %( class="#{image_tag.options[:class]}--picture") : ''
 
       sources = images.map do |image|
         type = image.match?(/webp$/) ? 'webp' : 'avif'

@@ -24,6 +24,6 @@ RSpec.describe BetterImageTag::PictureTag do
     default_image_tag = '<img src="1x1.jpg">'
     picture_tag = described_class.new(image_tag, default_image_tag)
 
-    expect(picture_tag.to_s).to include '<picture class="my-class"'
+    expect(picture_tag.to_s).to include '<picture class="my-class--picture"'
   end
 end
