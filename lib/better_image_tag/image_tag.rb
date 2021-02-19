@@ -29,7 +29,10 @@ module BetterImageTag
       self
     end
 
-    def lazy_load(placeholder: nil)
+    # rubocop:disable Metrics/AbcSize
+    def lazy_load(enabled: true)
+      return self unless enabled
+
       options[:class] = Array(options.fetch(:class, [])).join(' ')
       options[:class] = "#{options[:class]} lazyload".strip
       options[:data] = options[:data]
@@ -40,6 +43,7 @@ module BetterImageTag
 
       self
     end
+    # rubocop:enable Metrics/AbcSize
 
     def webp(url = nil)
       lazy_load_last!

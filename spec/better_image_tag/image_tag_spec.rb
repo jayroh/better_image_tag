@@ -46,6 +46,16 @@ RSpec.describe BetterImageTag::ImageTag do
 
       expect(result).to eq %(<img class="lazyload" data-src="#{url}" src="#{data}" />)
     end
+
+    context 'when passing `enabled: false`' do
+      it 'skips the lazy-load work' do
+        url = 'https://example.com/1x1.gif'
+
+        result = tag(image: url).lazy_load(enabled: false).to_s
+
+        expect(result).to eq %(<img src="#{url}" />)
+      end
+    end
   end
 
   describe '#with_size' do
