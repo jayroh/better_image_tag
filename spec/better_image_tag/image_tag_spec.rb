@@ -29,13 +29,13 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     context 'when passed a `webp:` option in the image tag' do
-      it "will do the proper webp work" do
+      it 'will do the proper webp work' do
         result = tag(image: '1x1.gif', options: { webp: '1x1.webp' }).to_s
 
         expect(result).to eq <<~EOPICTURE
           <picture>
             <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source srcset="/assets/1x1.webp" type="image/webp">
+            <source type="image/webp" srcset="/assets/1x1.webp">
             <!--[if IE 9]></video><![endif]-->
             <img use_super="true" src="/assets/1x1.gif" />
           </picture>
@@ -44,13 +44,13 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     context 'when passed a `avif:` option in the image tag' do
-      it "will do the proper avif work" do
+      it 'will do the proper avif work' do
         result = tag(image: '1x1.gif', options: { avif: '1x1.avif' }).to_s
 
         expect(result).to eq <<~EOPICTURE
           <picture>
             <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source srcset="/assets/1x1.avif" type="image/avif">
+            <source type="image/avif" srcset="/assets/1x1.avif">
             <!--[if IE 9]></video><![endif]-->
             <img use_super="true" src="/assets/1x1.gif" />
           </picture>
@@ -125,7 +125,7 @@ RSpec.describe BetterImageTag::ImageTag do
       expect(result).to eq <<~EOPICTURE
         <picture>
           <!--[if IE 9]><video style="display: none;"><![endif]-->
-          <source srcset="/assets/1x1.webp" type="image/webp">
+          <source type="image/webp" srcset="/assets/1x1.webp">
           <!--[if IE 9]></video><![endif]-->
           <img use_super="true" src="/assets/1x1.gif" />
         </picture>
@@ -138,7 +138,7 @@ RSpec.describe BetterImageTag::ImageTag do
       expect(result).to eq <<~EOPICTURE
         <picture>
           <!--[if IE 9]><video style="display: none;"><![endif]-->
-          <source srcset="http://example.com/another.webp" type="image/webp">
+          <source type="image/webp" srcset="http://example.com/another.webp">
           <!--[if IE 9]></video><![endif]-->
           <img use_super="true" src="/assets/1x1.gif" />
         </picture>
@@ -152,8 +152,8 @@ RSpec.describe BetterImageTag::ImageTag do
         expect(result).to eq <<~EOPICTURE
           <picture>
             <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source srcset="/assets/1x1.avif" type="image/avif">
-          <source srcset="/assets/1x1.webp" type="image/webp">
+            <source type="image/avif" srcset="/assets/1x1.avif">
+            <source type="image/webp" srcset="/assets/1x1.webp">
             <!--[if IE 9]></video><![endif]-->
             <img use_super="true" src="/assets/1x1.gif" />
           </picture>
@@ -169,10 +169,57 @@ RSpec.describe BetterImageTag::ImageTag do
         expect(result).to eq <<~EOPICTURE
           <picture class="lazyload--picture">
             <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source data-srcset="/assets/1x1.webp" type="image/webp">
+            <source type="image/webp" data-srcset="/assets/1x1.webp">
             <!--[if IE 9]></video><![endif]-->
             <img class="lazyload" data-src="/assets/1x1.gif" use_super="true" src="#{data}" />
           </picture>
+        EOPICTURE
+      end
+    end
+  end
+
+  %i(tablet desktop).each do |size|
+    describe "##{size}_up" do
+      let(:breakpoint) { BetterImageTag.configuration.send("#{size}_breakpoint".to_sym) }
+
+      it "returns picture tag with #{size} breakpoints in sources" do
+        result = tag(image: '1x1.gif').send("#{size}_up".to_sym, "1x1_#{size}.gif").to_s
+
+        expect(result).to eq <<~EOPICTURE
+        <picture>
+          <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source media="(min-width: #{breakpoint})" srcset="/assets/1x1_#{size}.gif">
+          <!--[if IE 9]></video><![endif]-->
+          <img use_super="true" src="/assets/1x1.gif" />
+        </picture>
+        EOPICTURE
+      end
+
+      it "returns picture tag with #{size} breakpoints AND formats in sources" do
+        result = tag(
+          image: '1x1.gif',
+          options: {
+            webp: '1x1.webp',
+            avif: '1x1.avif'
+          }
+        ).send(
+          "#{size}_up".to_sym,
+          "1x1_#{size}.gif",
+          webp: "1x1_#{size}.webp",
+          avif: "1x1_#{size}.avif"
+        ).to_s
+
+        expect(result).to eq <<~EOPICTURE
+        <picture>
+          <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source media="(min-width: #{breakpoint})" type="image/avif" srcset="/assets/1x1_#{size}.avif">
+          <source media="(min-width: #{breakpoint})" type="image/webp" srcset="/assets/1x1_#{size}.webp">
+          <source media="(min-width: #{breakpoint})" srcset="/assets/1x1_#{size}.gif">
+          <source type="image/avif" srcset="/assets/1x1.avif">
+          <source type="image/webp" srcset="/assets/1x1.webp">
+          <!--[if IE 9]></video><![endif]-->
+          <img use_super="true" src="/assets/1x1.gif" />
+        </picture>
         EOPICTURE
       end
     end
@@ -187,13 +234,13 @@ RSpec.describe BetterImageTag::ImageTag do
     end
 
     context 'when the image is an SVG' do
-      it "inlines the svg directly without an image tag" do
+      it 'inlines the svg directly without an image tag' do
         result = tag(image: 'sample.svg').inline.to_s
 
-        expect(result).to start_with "<svg "
+        expect(result).to start_with '<svg '
       end
 
-      it "adds width and height to the inlined svg " do
+      it 'adds width and height to the inlined svg ' do
         result = tag(
           image: 'sample.svg',
           options: { width: 10, height: 10 }
@@ -202,10 +249,10 @@ RSpec.describe BetterImageTag::ImageTag do
         expect(result).to start_with %(<svg width="10" height="10")
       end
 
-      it "adds css class to the inlined svg" do
+      it 'adds css class to the inlined svg' do
         result = tag(
           image: 'sample.svg',
-          options: { class: "logo" }
+          options: { class: 'logo' }
         ).inline.to_s
 
         expect(result).to start_with %(<svg class="logo")

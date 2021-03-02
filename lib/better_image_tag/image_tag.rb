@@ -6,7 +6,7 @@ module BetterImageTag
   class ImageTag
     TRANSPARENT_GIF = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
-    attr_reader :view_context, :options, :images
+    attr_reader :view_context, :options, :images, :tablet_options, :desktop_options
     attr_accessor :image
 
     def initialize(view_context, image, options = {})
@@ -15,8 +15,8 @@ module BetterImageTag
       @images = []
       @options = options.symbolize_keys
 
-      webp(@options[:webp]) if @options[:webp]
       avif(@options[:avif]) if @options[:avif]
+      webp(@options[:webp]) if @options[:webp]
       enforce_requirements
     end
 
@@ -77,6 +77,16 @@ module BetterImageTag
       PictureTag.new(self, result)
     end
 
+    def tablet_up(*tablet_options)
+      @tablet_options = tablet_options
+      self
+    end
+
+    def desktop_up(*desktop_options)
+      @desktop_options = desktop_options
+      self
+    end
+
     private
 
     def svg_string
@@ -86,7 +96,7 @@ module BetterImageTag
     end
 
     def image_tag_string
-      return if images.any?
+      return if images.any? || tablet_options&.any? || desktop_options&.any?
 
       view_context.image_tag(
         image,

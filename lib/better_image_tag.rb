@@ -31,7 +31,9 @@ module BetterImageTag
       :inlining_enabled,
       :require_alt_tags,
       :sizing_enabled,
-      :images_path
+      :images_path,
+      :tablet_breakpoint,
+      :desktop_breakpoint
     )
 
     def initialize
@@ -40,6 +42,8 @@ module BetterImageTag
       @cache_inlining_enabled = false
       @inlining_enabled = true
       @sizing_enabled = true
+      @tablet_breakpoint = '768px'
+      @desktop_breakpoint = '1280px'
       @images_path = "#{rails_root}/app/assets/images"
     end
 
