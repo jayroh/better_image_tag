@@ -218,7 +218,9 @@ Examples - chainable methods on `image_tag`:
 
 ## Rake task(s)
 
-Included in this gem are a pair of rake tasks that will find all jpg's in your project and will convert them to webp's, or avif's, if you have the appropriate tooling available on your machine.
+Included in this gem are a pair of rake tasks that will find all jpg's in your
+project and will convert them to webp's, or avif's, if you have the appropriate
+tooling available on your machine.
 
 ```
 bundle exec rake better_image_tag:convert_jpgs_to_webp
@@ -227,11 +229,13 @@ bundle exec rake better_image_tag:convert_jpgs_to_avif
 
 For webp you will need [ImageMagick] installed. On Macs with [homebrew] you may install with `brew install imagemagick`.
 
-For avif you will need the `go-avif` tool, which has [binaries publicly available on their GitHub releases page].
+For avif you will need the `cavif-rs` tool, which has [binaries publicly
+available on their GitHub releases page]. Download and make sure the `cavif`
+binary in that zipfile are in your `$PATH`.
 
 [ImageMagick]: https://imagemagick.org/index.php
 [homebrew]: https://brew.sh
-[binaries publicly available on their GitHub releases page]: https://github.com/Kagami/go-avif/releases
+[binaries publicly available on their GitHub releases page]: https://github.com/kornelski/cavif-rs/releases
 
 ## Testing
 

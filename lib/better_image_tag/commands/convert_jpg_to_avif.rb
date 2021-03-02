@@ -18,7 +18,7 @@ module BetterImageTag
           avif = jpg.gsub(/\.jpe?g\z/i, '.avif')
           next if File.exist? avif
 
-          @jpgs_converted += 1 if system("avif -q 32 -e #{jpg} -o #{avif}")
+          @jpgs_converted += 1 if system("cavif --quality 45 --overwrite --quiet #{jpg}")
         end
 
         puts "#{@jpgs_converted} jpgs converted to avif."
