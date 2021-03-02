@@ -27,6 +27,36 @@ RSpec.describe BetterImageTag::ImageTag do
 
       expect(result).to eq '<img src="https://example.com/1.gif" />'
     end
+
+    context 'when passed a `webp:` option in the image tag' do
+      it "will do the proper webp work" do
+        result = tag(image: '1x1.gif', options: { webp: '1x1.webp' }).to_s
+
+        expect(result).to eq <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source srcset="/assets/1x1.webp" type="image/webp">
+            <!--[if IE 9]></video><![endif]-->
+            <img use_super="true" src="/assets/1x1.gif" />
+          </picture>
+        EOPICTURE
+      end
+    end
+
+    context 'when passed a `avif:` option in the image tag' do
+      it "will do the proper avif work" do
+        result = tag(image: '1x1.gif', options: { avif: '1x1.avif' }).to_s
+
+        expect(result).to eq <<~EOPICTURE
+          <picture>
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source srcset="/assets/1x1.avif" type="image/avif">
+            <!--[if IE 9]></video><![endif]-->
+            <img use_super="true" src="/assets/1x1.gif" />
+          </picture>
+        EOPICTURE
+      end
+    end
   end
 
   describe '#lazy_load' do
@@ -137,7 +167,7 @@ RSpec.describe BetterImageTag::ImageTag do
         data = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
         expect(result).to eq <<~EOPICTURE
-          <picture class="lazyload">
+          <picture class="lazyload--picture">
             <!--[if IE 9]><video style="display: none;"><![endif]-->
             <source data-srcset="/assets/1x1.webp" type="image/webp">
             <!--[if IE 9]></video><![endif]-->

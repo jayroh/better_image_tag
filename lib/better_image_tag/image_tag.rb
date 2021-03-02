@@ -15,6 +15,8 @@ module BetterImageTag
       @images = []
       @options = options.symbolize_keys
 
+      webp(@options[:webp]) if @options[:webp]
+      avif(@options[:avif]) if @options[:avif]
       enforce_requirements
     end
 
@@ -68,7 +70,10 @@ module BetterImageTag
     end
 
     def picture_tag
-      result = view_context.image_tag(image, options.merge(use_super: true))
+      result = view_context.image_tag(
+        image,
+        options.except(:webp, :avif).merge(use_super: true)
+      )
       PictureTag.new(self, result)
     end
 
@@ -83,7 +88,10 @@ module BetterImageTag
     def image_tag_string
       return if images.any?
 
-      view_context.image_tag(image, options.merge(super_options))
+      view_context.image_tag(
+        image,
+        options.except(:webp, :avif).merge(super_options)
+      )
     end
 
     def picture_tag_string
