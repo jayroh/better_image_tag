@@ -15,15 +15,30 @@ RSpec.describe BetterImageTag::PictureTag do
     end
   end
 
-  it 'adds the class from the image tag to <picture>' do
-    image_tag = BetterImageTag::ImageTag.new(
-      view_context,
-      '1x1.jpg',
-      class: 'my-class'
-    )
-    default_image_tag = '<img src="1x1.jpg">'
-    picture_tag = described_class.new(image_tag, default_image_tag)
+  context 'when adding class(es) to image tag' do
+    it 'adds adjusted class from the image tag to <picture> with `--picture` suffix' do
+      image_tag = BetterImageTag::ImageTag.new(
+        view_context,
+        '1x1.jpg',
+        class: 'my-class'
+      )
+      default_image_tag = '<img src="1x1.jpg">'
+      picture_tag = described_class.new(image_tag, default_image_tag)
 
-    expect(picture_tag.to_s).to include '<picture class="my-class--picture"'
+      expect(picture_tag.to_s).to include '<picture class="my-class--picture"'
+    end
+
+    it 'adds it to all classes, except lazyload ' do
+      image_tag = BetterImageTag::ImageTag.new(
+        view_context,
+        '1x1.jpg',
+        class: 'first second'
+      ).lazy_load
+
+      default_image_tag = '<img src="1x1.jpg">'
+      picture_tag = described_class.new(image_tag, default_image_tag)
+
+      expect(picture_tag.to_s).to include '<picture class="first--picture second--picture lazyload"'
+    end
   end
 end

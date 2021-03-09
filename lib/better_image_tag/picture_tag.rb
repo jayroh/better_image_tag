@@ -29,8 +29,9 @@ module BetterImageTag
 
     def output(loading_style)
       return if loading_style == :lazily && image != ImageTag::TRANSPARENT_GIF
+
       @srcset = loading_style == :lazily ? 'data-srcset' : 'srcset'
-      css_class = css_class? ? %( class="#{image_tag.options[:class]}--picture") : ''
+      css_class = css_class? ? %( class="#{css_classes}") : ''
 
       populate_responsive_and_format_sources
       populate_responsive_sources
@@ -48,6 +49,12 @@ module BetterImageTag
 
     def css_class?
       image_tag.options[:class].present?
+    end
+
+    def css_classes
+      image_tag.options[:class].split(' ').map do |css_class|
+        css_class == 'lazyload' ? 'lazyload' : "#{css_class}--picture"
+      end.join(" ")
     end
 
     def populate_responsive_and_format_sources
