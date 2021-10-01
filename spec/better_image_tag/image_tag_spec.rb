@@ -6,7 +6,7 @@ RSpec.describe BetterImageTag::ImageTag do
   let(:view_context) do
     view_paths = ActionController::Base.view_paths
     lookup_context = ActionView::LookupContext.new(view_paths)
-    ActionView::Base.new(lookup_context, {})
+    ActionView::Base.new(lookup_context, {}, nil)
   end
 
   before do

@@ -8,6 +8,7 @@ module BetterImageTag
   class InlineData
     HTTP_ERRORS = [
       EOFError,
+      Errno::ECONNREFUSED,
       Errno::ECONNRESET,
       Errno::EINVAL,
       Net::HTTPBadResponse,
@@ -69,7 +70,7 @@ module BetterImageTag
     def contents
       @_contents ||= begin
         if image.match?(%r{https?://})
-          open(image).read
+          URI.open(image).read
         elsif local_file?
           File.read(image)
         elsif not_compiled?
