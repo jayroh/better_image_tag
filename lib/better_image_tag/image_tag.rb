@@ -152,7 +152,7 @@ module BetterImageTag
     end
 
     def not_compiled?
-      Rails.env.development? || Rails.env.test?
+      !!Rails.application.assets
     end
 
     def enforce_requirements
