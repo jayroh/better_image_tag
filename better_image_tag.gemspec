@@ -34,7 +34,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastimage'
   spec.add_dependency 'mimemagic'
-  spec.add_dependency 'rails'
+  spec.add_dependency 'rails', ['>= 5', '< 7.0']
+
 
   spec.add_development_dependency 'bundler', '~> 2.1'
   spec.add_development_dependency 'pry-byebug'
