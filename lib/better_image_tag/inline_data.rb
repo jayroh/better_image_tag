@@ -92,7 +92,7 @@ module BetterImageTag
     # rubocop:enable Security/Open
 
     def not_compiled?
-      Rails.env.development? || Rails.env.test?
+      !!Rails.application.assets
     end
 
     def local_file?
