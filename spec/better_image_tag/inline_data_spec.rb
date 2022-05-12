@@ -47,7 +47,7 @@ RSpec.describe BetterImageTag::InlineData do
       it 'returns the original image src when ssl error' do
         url = 'http://localhost/nothing.jpg'
         inliner = BetterImageTag::InlineData.new(url)
-        allow(inliner).to receive(:open).and_raise(OpenSSL::SSL::SSLError)
+        allow(URI).to receive(:open).and_raise(OpenSSL::SSL::SSLError)
 
         result = inliner.inline_data
 
@@ -58,7 +58,7 @@ RSpec.describe BetterImageTag::InlineData do
         url = 'http://localhost/nothing.jpg'
         inliner = BetterImageTag::InlineData.new(url)
         error = OpenURI::HTTPError.new 'error', nil
-        allow(inliner).to receive(:open).and_raise(error)
+        allow(URI).to receive(:open).and_raise(error)
 
         result = inliner.inline_data
 

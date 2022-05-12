@@ -69,7 +69,7 @@ module BetterImageTag
     def contents
       @_contents ||= begin
         if image.match?(%r{https?://})
-          open(image).read
+          URI.open(image).read
         elsif local_file?
           File.read(image)
         elsif not_compiled?
