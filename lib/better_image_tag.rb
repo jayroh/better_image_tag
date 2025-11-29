@@ -33,7 +33,9 @@ module BetterImageTag
       :sizing_enabled,
       :images_path,
       :tablet_breakpoint,
-      :desktop_breakpoint
+      :desktop_breakpoint,
+      :network_timeout,
+      :on_error
     )
 
     def initialize
@@ -45,6 +47,15 @@ module BetterImageTag
       @tablet_breakpoint = '768px'
       @desktop_breakpoint = '1280px'
       @images_path = "#{rails_root}/app/assets/images"
+      @network_timeout = 10
+      @on_error = nil
+    end
+
+    def on_error=(callback)
+      unless callback.nil? || callback.respond_to?(:call)
+        raise ArgumentError, 'on_error must be a callable object (proc, lambda, or method)'
+      end
+      @on_error = callback
     end
 
     private

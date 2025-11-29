@@ -33,7 +33,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'fastimage'
-  spec.add_dependency 'mimemagic'
+  spec.add_dependency 'marcel', '~> 1.0'
+  spec.add_dependency 'nokogiri', '>= 1.12.0'
   spec.add_dependency 'rails', ['>= 5']
   spec.add_dependency 'sprockets-rails'
 
