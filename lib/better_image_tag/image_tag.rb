@@ -109,7 +109,8 @@ module BetterImageTag
     end
 
     def svg?
-      MimeMagic.by_magic(@image)&.type == 'image/svg+xml'
+      return false unless @image.is_a?(String)
+      Marcel::MimeType.for(@image, name: image) == 'image/svg+xml'
     end
 
     def super_options

@@ -9,5 +9,7 @@ module BetterImageTag
     class ConvertNotFound < Error; end
     class AvifNotFound < Error; end
     class FileNotFound < Error; end
+    class RemoteFetchError < Error; end
+    class InvalidSvgError < Error; end
   end
 end

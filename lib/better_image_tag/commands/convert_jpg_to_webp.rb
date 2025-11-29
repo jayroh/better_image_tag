@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module BetterImageTag
   module Commands
     class ConvertJpgToWebp
@@ -18,13 +20,17 @@ module BetterImageTag
           webp = jpg.gsub(/\.jpe?g\z/i, '.webp')
           next if File.exist? webp
 
-          @jpgs_converted += 1 if system("convert #{jpg} #{webp}")
+          @jpgs_converted += 1 if convert_image(jpg, webp)
         end
 
         puts "#{@jpgs_converted} jpgs converted to webp."
       end
 
       private
+
+      def convert_image(source, destination)
+        system('convert', source, destination)
+      end
 
       def ensure_convert_present!
         return if convert_exists?
@@ -36,8 +42,7 @@ module BetterImageTag
       end
 
       def convert_exists?
-        `which convert`
-        $CHILD_STATUS.success?
+        system('which', 'convert', out: File::NULL, err: File::NULL)
       end
 
       def jpg_assets

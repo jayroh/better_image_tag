@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module BetterImageTag
   module Commands
     class ConvertJpgToAvif
@@ -18,13 +20,17 @@ module BetterImageTag
           avif = jpg.gsub(/\.jpe?g\z/i, '.avif')
           next if File.exist? avif
 
-          @jpgs_converted += 1 if system("avif -q 32 -e #{jpg} -o #{avif}")
+          @jpgs_converted += 1 if convert_image(jpg, avif)
         end
 
         puts "#{@jpgs_converted} jpgs converted to avif."
       end
 
       private
+
+      def convert_image(source, destination)
+        system('avif', '-q', '32', '-e', source, '-o', destination)
+      end
 
       def ensure_avif_present!
         return if avif_exists?
@@ -36,8 +42,7 @@ module BetterImageTag
       end
 
       def avif_exists?
-        `which avif`
-        $CHILD_STATUS.success?
+        system('which', 'avif', out: File::NULL, err: File::NULL)
       end
 
       def jpg_assets

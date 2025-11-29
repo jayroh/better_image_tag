@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require 'mimemagic'
+require 'marcel'
 require 'base64'
-require 'open-uri'
+require 'net/http'
+require 'uri'
 
 module BetterImageTag
   class InlineData
@@ -10,13 +11,18 @@ module BetterImageTag
       EOFError,
       Errno::ECONNRESET,
       Errno::EINVAL,
+      Errno::ECONNREFUSED,
       Net::HTTPBadResponse,
       Net::HTTPHeaderSyntaxError,
       Net::ProtocolError,
+      Net::ReadTimeout,
+      Net::OpenTimeout,
       Timeout::Error,
       OpenSSL::SSL::SSLError,
-      OpenURI::HTTPError
+      SocketError
     ].freeze
+
+    DEFAULT_TIMEOUT = 10 # seconds
 
     CACHE_PREFIX = 'inline_data'
 
@@ -37,7 +43,8 @@ module BetterImageTag
       cache "#{CACHE_PREFIX}:#{image}" do
         svg? ? contents : "data:#{content_type};base64,#{base64_contents}"
       end
-    rescue *HTTP_ERRORS
+    rescue *HTTP_ERRORS => e
+      handle_error(e)
       image
     end
 
@@ -58,18 +65,17 @@ module BetterImageTag
     end
 
     def content_type
-      MimeMagic.by_magic(contents).type
+      Marcel::MimeType.for(contents, name: image) || 'application/octet-stream'
     end
 
     def base64_contents
       Base64.strict_encode64 contents
     end
 
-    # rubocop:disable Security/Open
     def contents
       @_contents ||= begin
         if image.match?(%r{https?://})
-          URI.open(image).read
+          fetch_remote_content
         elsif local_file?
           File.read(image)
         elsif not_compiled?
@@ -89,7 +95,27 @@ module BetterImageTag
         end
       end
     end
-    # rubocop:enable Security/Open
+
+    def fetch_remote_content
+      uri = URI.parse(image)
+      timeout = BetterImageTag.configuration.network_timeout || DEFAULT_TIMEOUT
+
+      Net::HTTP.start(uri.host, uri.port,
+                      use_ssl: uri.scheme == 'https',
+                      open_timeout: timeout,
+                      read_timeout: timeout,
+                      ssl_timeout: timeout) do |http|
+        request = Net::HTTP::Get.new(uri)
+        response = http.request(request)
+
+        unless response.is_a?(Net::HTTPSuccess)
+          raise BetterImageTag::Errors::RemoteFetchError,
+                "Failed to fetch #{image}: #{response.code} #{response.message}"
+        end
+
+        response.body
+      end
+    end
 
     def not_compiled?
       !!Rails.application.assets
@@ -97,6 +123,11 @@ module BetterImageTag
 
     def local_file?
       @local_file
+    end
+
+    def handle_error(error)
+      callback = BetterImageTag.configuration.on_error
+      callback&.call(error, image: image, operation: :inline_data)
     end
   end
 end
